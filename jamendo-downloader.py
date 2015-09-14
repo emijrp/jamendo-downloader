@@ -24,8 +24,8 @@
 # If you want to download both formats, I recommend to create two different directories and run the script inside both
 
 # Argument 4 is a limit for download speed in kb/s (optional). Format (number + k): 100k
-# python jamendoalbums.py 0 100000 mp3 250k
-# or python jamendoalbums.py 0 100000 ogg 400k
+# python jamendo-downloader.py 0 100000 mp3 250k
+# or python jamendo-downloader.py 0 100000 ogg 400k
 
 # More info (and XML database with albums metadata) http://developer.jamendo.com/en/wiki/NewDatabaseDumps
 
@@ -91,8 +91,8 @@ def main():
             name = re.sub(ur'"', ur'\\"', name)
             
             if name:
-                subdir = '%.6d-%.6d' % ((id/1000)*1000, (id/1000)*1000+999)
-                prefix = '[%.6d] ' % (id)
+                subdir = u'%.6d-%.6d' % ((id/1000)*1000, (id/1000)*1000+999)
+                prefix = u'[%.6d] ' % (id)
                 
                 #make dir
                 if not os.path.exists(subdir):
@@ -101,8 +101,9 @@ def main():
                 #download .zip
                 urlzip = 'https://storage.jamendo.com/download/a%d/%s/' % (id, sound)
                 pathzip = subdir
-                zipname = '%s%s.zip' % (prefix, name)
-                os.system('wget "%s" -O "%s/%s" -c --limit-rate=%s' % (urlzip, pathzip, zipname, speed))
+                zipname = u'%s%s.zip' % (prefix, name)
+                downloadthis = u'wget "%s" -O "%s/%s" -c --limit-rate=%s' % (urlzip, pathzip, zipname, speed)
+                os.system(downloadthis.encode('utf-8'))
                 time.sleep(2)            
 
 if __name__ == '__main__':
