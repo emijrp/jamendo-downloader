@@ -75,31 +75,35 @@ def main():
         print 'Trying to download album [%d]' % (id)
         time.sleep(1)
         
-        urlalbum = ''
+        urlalbum = 'https://www.jamendo.com/album/%s/' % (id)
         try:
             req = urllib2.Request(urlalbum, headers={ 'User-Agent': 'Mozilla/5.0' })
             html = unicode(urllib2.urlopen(req).read(), 'utf-8')
         except:
+            print 'ERROR: can not download html'
             break
         
-        m = re.findall(ur'"album":{"id":"%d","type":"album","title":"(.+?)","cover":' % (id), html)
-        for i in m:
-            name = i[0]
-            name = re.sub(ur'"', ur'\\"', name)
-            break
-        
-        if name:
-            subdir = '%.6d-%.6d' % ((id/1000)*1000, (id/1000)*1000+999)
-            prefix = '[%.6d] ' % (id)
-            
-            #download .zip
-            urlzip = 'https://storage.jamendo.com/download/a%d/%s/' % (id, sound)
-            pathzip = subdir
-            zipname = '%s%s.zip' % (prefix, name)
-            os.system('wget "%s" -O "%s/%s" -c --limit-rate=%s' % (urlzip, pathzip, zipname, speed))
-            time.sleep(2)            
-        else:
+        if not re.search(ur'<meta property="og:type" content="music.album" />', html):
             print 'No album [%d] available' % (id)
+        else:    
+            name = ''
+            name = re.findall(ur'<meta property="og:title" content="([^>]+?)"\s*/>', html)[0]
+            name = re.sub(ur'"', ur'\\"', name)
+            
+            if name:
+                subdir = '%.6d-%.6d' % ((id/1000)*1000, (id/1000)*1000+999)
+                prefix = '[%.6d] ' % (id)
+                
+                #make dir
+                if not os.path.exists(subdir):
+                    os.makedirs(subdir)
+                
+                #download .zip
+                urlzip = 'https://storage.jamendo.com/download/a%d/%s/' % (id, sound)
+                pathzip = subdir
+                zipname = '%s%s.zip' % (prefix, name)
+                os.system('wget "%s" -O "%s/%s" -c --limit-rate=%s' % (urlzip, pathzip, zipname, speed))
+                time.sleep(2)            
 
 if __name__ == '__main__':
     main()
