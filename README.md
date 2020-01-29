@@ -1,3 +1,3 @@
 # jamendo-downloader
 
-Script to download Jamendo albums
+Script to download Jamendo albums.
